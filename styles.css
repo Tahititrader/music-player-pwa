@@ -1,0 +1,172 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0b;
+  --fg: #f3f3f3;
+  --muted: #9aa0a6;
+  --card: #151515;
+  --accent: #6366f1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.4 system-ui, Segoe UI, Roboto, Arial;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #0b0b0bcc;
+  backdrop-filter: saturate(120%) blur(8px);
+  border-bottom: 1px solid #222;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 12px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.queue,
+.player {
+  background: var(--card);
+  border: 1px solid #222;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.queue-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #222;
+}
+
+.row:first-child {
+  border-top: none;
+}
+
+.row.active {
+  outline: 1px solid #3b3eef44;
+  background: #1b1b23;
+}
+
+.row-btn {
+  flex: 1;
+  text-align: left;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+}
+
+.del {
+  background: none;
+  border: none;
+  color: #e57373;
+}
+
+.title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: #222;
+  color: inherit;
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: #4f51e0;
+  color: white;
+}
+
+.chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #111;
+  color: inherit;
+}
+
+.chip.on {
+  background: #222;
+  border-color: #555;
+}
+
+.vol {
+  margin-top: 8px;
+}
+
+.foot {
+  padding: 16px;
+  text-align: center;
+  border-top: 1px solid #222;
+  font-size: 13px;
+}
+
+input[type="range"] {
+  width: 100%;
+}
