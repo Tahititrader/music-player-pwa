@@ -275,6 +275,187 @@ canvas{display:block;border-radius:12px;border:1px solid #1f2937}
 (function(){
   const css = document.createElement('style'); css.textContent = `
   .ai-btn{position:fixed;right:16px;bottom:16px;z-index:50;padding:12px 14px;border-radius:12px;border:1px solid #333;background:#17181b;color:#fff}
-  .ai-panel{position:fixed;right:16px;bottom:72px;z-index:49;width:min(520px,96vw);max-height:80vh;display:none;flex-direction:column;gap:8
+  .ai-panel{position:fixed;right:16px;bottom:72px;z-index:49;width:min(520px,96vw);max-height:80vh;display:none;flex-direction:column;gap:8px;background:#0f1115;border:1px solid #30363d;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .ai-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1f2937}
+  .ai-body{display:grid;grid-template-rows:auto auto 1fr auto;gap:8px;padding:10px 12px}
+  .ai-row{display:flex;gap:8px;align-items:center}
+  .ai-row input, .ai-row select{flex:1;padding:8px;border-radius:10px;border:1px solid #30363d;background:#0b0d11;color:#fff}
+  .ai-text{min-height:72px;max-height:180px;padding:8px;border-radius:10px;border:1px solid #30363d;background:#0b0d11;color:#fff;resize:vertical}
+  .ai-log{overflow:auto;padding:8px;border-radius:10px;border:1px solid #30363d;background:#0b0d11;color:#e5e7eb;min-height:120px;max-height:300px;white-space:pre-wrap}
+  .ai-actions{display:flex;gap:8px;justify-content:flex-end}
+  .ai-actions button{padding:8px 12px;border-radius:10px;border:1px solid #30363d;background:#17181b;color:#fff}
+  .ai-actions .primary{background:linear-gradient(135deg,#7c3aed,#22d3ee);border:none;color:#0b0b0b;font-weight:600}
+  `; document.head.appendChild(css);
+
+  const panel = document.createElement('div');
+  panel.className = 'ai-panel';
+  panel.innerHTML = `
+    <div class="ai-header">
+      <strong>Agent IA — Chat</strong>
+      <div class="ai-row" style="gap:6px">
+        <select id="ai-provider">
+          <option value="openai">ChatGPT (OpenAI)</option>
+          <option value="perplexity">Perplexity</option>
+          <option value="gemini">Gemini</option>
+          <option value="azure">Azure (Copilot)</option>
+        </select>
+        <button id="ai-close">✕</button>
+      </div>
+    </div>
+    <div class="ai-body">
+      <div class="ai-row" id="row-openai"><input id="ai-openai" placeholder="OpenAI API Key (sk-...)" type="password"/></div>
+      <div class="ai-row" id="row-perp" style="display:none"><input id="ai-perplexity" placeholder="Perplexity API Key (pplx-...)" type="password"/></div>
+      <div class="ai-row" id="row-gem"  style="display:none"><input id="ai-gemini" placeholder="Gemini API Key (AI...)" type="password"/></div>
+      <div class="ai-row" id="row-azure" style="display:none">
+        <input id="ai-azure-url"   placeholder="Azure Base URL (https://<resource>.openai.azure.com)"/>
+        <input id="ai-azure-key"   placeholder="Azure Key" type="password"/>
+        <input id="ai-azure-deploy" placeholder="Deployment (ex: gpt-4o-mini)"/>
+      </div>
+      <textarea id="ai-input" class="ai-text" placeholder="Ex: Génère une playlist 120–128 BPM, mood focus."></textarea>
+      <div id="ai-log" class="ai-log"></div>
+      <div class="ai-actions">
+        <button id="ai-context">Contexte</button>
+        <button id="ai-save">Sauver clés</button>
+        <button id="ai-send" class="primary">Envoyer</button>
+      </div>
+    </div>`;
+
+  const btn = document.createElement('button'); btn.className='ai-btn'; btn.id='ai-toggle'; btn.textContent='🤖 IA';
+  document.body.appendChild(panel); document.body.appendChild(btn);
+
+  const $ = (s)=>panel.querySelector(s), logEl = $('#ai-log');
+  const log = (m)=>{ logEl.textContent += m + "\n"; logEl.scrollTop = logEl.scrollHeight; };
+
+  const store = {
+    load(){ try{ return JSON.parse(localStorage.getItem('pwaMusic.ai')||'{}'); }catch{return {}} },
+    save(v){ localStorage.setItem('pwaMusic.ai', JSON.stringify(v)); }
+  };
+  const state = store.load();
+  $('#ai-provider').value = state.provider || 'openai';
+  $('#ai-openai').value = state.openaiKey || '';
+  $('#ai-perplexity').value = state.perplexityKey || '';
+  $('#ai-gemini').value = state.geminiKey || '';
+  $('#ai-azure-url').value = state.azureUrl || '';
+  $('#ai-azure-key').value = state.azureKey || '';
+  $('#ai-azure-deploy').value = state.azureDeploy || '';
+
+  function showRows(p){
+    $('#row-openai').style.display = (p==='openai') ? '' : 'none';
+    $('#row-perp').style.display   = (p==='perplexity') ? '' : 'none';
+    $('#row-gem').style.display    = (p==='gemini') ? '' : 'none';
+    $('#row-azure').style.display  = (p==='azure') ? '' : 'none';
+  }
+  showRows($('#ai-provider').value);
+
+  // UI
+  btn.onclick = ()=> panel.style.display = (panel.style.display==='flex')? 'none' : 'flex';
+  panel.style.display='none'; panel.style.flexDirection='column';
+  $('#ai-close').onclick = ()=> panel.style.display='none';
+  $('#ai-provider').onchange = e => { const p=e.target.value; const cur=store.load(); cur.provider=p; store.save(cur); showRows(p); };
+
+  // Contexte du player
+  function getCtx(){
+    try{
+      const now = (document.getElementById('now')?.textContent || document.getElementById('title')?.textContent || '—').trim();
+      const count = (document.getElementById('count')?.textContent || '(0)');
+      const theme = document.body.getAttribute('data-theme') || 'midnight';
+      const items = Array.from(document.querySelectorAll('#list .item .title, #list .row .row-btn'))
+        .map(el=>el.textContent.replace(/^▶\s*/,''));
+      const sliders = Array.from(document.querySelectorAll('#eq input[type="range"]'));
+      const gains = sliders.length ? sliders.map(sl=> Number(sl.value)) : [];
+      const preset = document.getElementById('preset')?.value || 'flat';
+      const shuffleOn = document.getElementById('shuffle')?.classList.contains('primary') || false;
+      const repeatOn  = document.getElementById('repeat')?.classList.contains('primary') || false;
+      return { now, count, theme, gains, preset, shuffleOn, repeatOn, items: items.slice(0,50) };
+    }catch(e){ return {error:String(e)} }
+  }
+
+  function sysPrompt(){
+    return 'Tu es un agent IA intégré dans un lecteur de musique local. '+
+           'Objectifs: proposer playlists, presets d’égaliseur (7 bandes), transitions par BPM/énergie. '+
+           'Réponds en français, concis. Si tu proposes une playlist, ajoute un JSON minimal: {\"playlist\":[\"titre1\",...]}';
+  }
+  function msgs(user){ const pre = `Contexte lecteur: ${JSON.stringify(getCtx()).slice(0,1800)}\\n\\nConsigne: ${user}`; return [
+    {role:'system', content: sysPrompt()}, {role:'user', content: pre}
+  ]; }
+
+  // Providers
+  async function callOpenAI(key, messages, model='gpt-4o-mini'){
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body: JSON.stringify({ model, messages, temperature:0.3 })
+    });
+    if(!r.ok) throw new Error('OpenAI: '+r.status+' '+await r.text());
+    const j = await r.json(); return j.choices?.[0]?.message?.content?.trim()||'';
+  }
+  async function callPerplexity(key, messages, model='sonar-small-chat'){
+    const r = await fetch('https://api.perplexity.ai/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body: JSON.stringify({ model, messages, temperature:0.2 })
+    });
+    if(!r.ok) throw new Error('Perplexity: '+r.status+' '+await r.text());
+    const j = await r.json(); return j.choices?.[0]?.message?.content?.trim()||'';
+  }
+  async function callGemini(key, messages){
+    const prompt = messages.map(m=> `${m.role.toUpperCase()}: ${m.content}`).join('\\n\\n');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${encodeURIComponent(key)}`;
+    const r = await fetch(url,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }) });
+    if(!r.ok) throw new Error('Gemini: '+r.status+' '+await r.text());
+    const j = await r.json(); return j.candidates?.[0]?.content?.parts?.map(p=>p.text).join('') || '';
+  }
+  async function callAzure(base, key, deploy, messages){
+    const url = `${base.replace(/\/$/,'')}/openai/deployments/${encodeURIComponent(deploy)}/chat/completions?api-version=2024-06-01`;
+    const r = await fetch(url,{ method:'POST', headers:{'Content-Type':'application/json','api-key':key}, body: JSON.stringify({ messages, temperature:0.3 }) });
+    if(!r.ok) throw new Error('Azure: '+r.status+' '+await r.text());
+    const j = await r.json(); return j.choices?.[0]?.message?.content?.trim()||'';
+  }
+
+  // Actions
+  $('#ai-save').onclick = ()=>{
+    const provider = $('#ai-provider').value;
+    const next = {
+      provider,
+      openaiKey: ($('#ai-openai')?.value||'').trim(),
+      perplexityKey: ($('#ai-perplexity')?.value||'').trim(),
+      geminiKey: ($('#ai-gemini')?.value||'').trim(),
+      azureUrl: ($('#ai-azure-url')?.value||'').trim(),
+      azureKey: ($('#ai-azure-key')?.value||'').trim(),
+      azureDeploy: ($('#ai-azure-deploy')?.value||'').trim(),
+    };
+    store.save(next);
+    log('✅ Clés enregistrées localement.');
+  };
+
+  $('#ai-context').onclick = ()=> log('📦 Contexte: '+JSON.stringify(getCtx()));
+
+  $('#ai-send').onclick = async ()=>{
+    const text = (panel.querySelector('#ai-input')?.value||'').trim();
+    if(!text){ log('⛔ Entre un message.'); return; }
+    log('👤 '+text);
+    try{
+      const provider = $('#ai-provider').value;
+      const S = store.load();
+      const M = msgs(text);
+      let out='';
+      if(provider==='openai'){
+        if(!S.openaiKey) throw new Error('Ajoute ta clé OpenAI.');
+        out = await callOpenAI(S.openaiKey, M);
+      }else if(provider==='perplexity'){
+        if(!S.perplexityKey) throw new Error('Ajoute ta clé Perplexity.');
+        out = await callPerplexity(S.perplexityKey, M);
+      }else if(provider==='gemini'){
+        if(!S.geminiKey) throw new Error('Ajoute ta clé Gemini.');
+        out = await callGemini(S.geminiKey, M);
+      }else if(provider==='azure'){
+        if(!S.azureUrl||!S.azureKey||!S.azureDeploy) throw new Error('Renseigne URL/Key/Deployment Azure.');
+        out = await callAzure(S.azureUrl, S.azureKey, S.azureDeploy, M);
+      }
+      log('🤖 '+out);
+      try{ const m=out.match(/\{\s*\"playlist\"[\s\S]*\}/); if(m){ const j=JSON.parse(m[0]); if(Array.isArray(j.playlist)) log('🎵 Playlist: '+j.playlist.join(' | ')); } }catch{}
+    }catch(e){ log('❌ '+e.message); }
+  };
+})();
+</script>
+<!-- === /IA PANEL === -->
 </body>
 </html>
