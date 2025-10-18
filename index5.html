@@ -270,6 +270,11 @@ canvas{display:block;border-radius:12px;border:1px solid #1f2937}
   canvas.width=canvas.clientWidth*2; canvas.height=200;
   document.addEventListener('keydown',(e)=>{ const k=e.key.toLowerCase(); if(k===' '){ e.preventDefault(); if(audio.paused) audio.play(); else audio.pause(); } if(k==='arrowright') audio.currentTime=Math.min(audio.duration||0, audio.currentTime+5); if(k==='arrowleft') audio.currentTime=Math.max(0, audio.currentTime-5); });
   </script>
-<script src="./ai-integration.js?v=1"></script>
+<!-- === IA PANEL (inline, no-cache) === -->
+<script>
+(function(){
+  const css = document.createElement('style'); css.textContent = `
+  .ai-btn{position:fixed;right:16px;bottom:16px;z-index:50;padding:12px 14px;border-radius:12px;border:1px solid #333;background:#17181b;color:#fff}
+  .ai-panel{position:fixed;right:16px;bottom:72px;z-index:49;width:min(520px,96vw);max-height:80vh;display:none;flex-direction:column;gap:8
 </body>
 </html>
