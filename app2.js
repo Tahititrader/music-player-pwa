@@ -3,7 +3,8 @@ const listEl = $('#list'), titleEl = $('#title'), countEl = $('#count');
 const fileEl = $('#file'), audio = $('#audio'), seek = $('#seek');
 const tcur = $('#tcur'), tdur = $('#tdur');
 const btnPlay = $('#play'), btnPrev = $('#prev'), btnNext = $('#next');
-const btnPick = $('#pick'), btnShuffle = $('#shuffle'), btnRepeat = $('#repeat');
+const btnPick = $('#pick'), btnPick2 = $('#pick2');
+const btnShuffle = $('#shuffle'), btnRepeat = $('#repeat');
 const vol = $('#vol');
 
 let tracks = [], index = 0, shuffle = false, repeatOne = false;
@@ -32,25 +33,11 @@ function next() {
 function prev() { setTrack((index - 1 + tracks.length) % tracks.length); }
 
 btnPlay.onclick = () => (audio.paused ? audio.play() : audio.pause());
-btnNext.onclick = next; btnPrev.onclick = prev; btnPick.onclick = () => fileEl.click();
+btnNext.onclick = next; btnPrev.onclick = prev;
 btnShuffle.onclick = () => { shuffle = !shuffle; btnShuffle.classList.toggle('on', shuffle); };
 btnRepeat.onclick   = () => { repeatOne = !repeatOne; btnRepeat.classList.toggle('on', repeatOne); };
-
-fileEl.onchange = (e) => addFiles(e.target.files);
-
-function addFiles(fileList) {
-  const files = Array.from(fileList || []);
-  const allowedExt = /\.(mp3|m4a|aac|flac|wav|ogg|oga)$/i;
-  const audios = files.filter(f => (f.type && f.type.startsWith('audio')) || allowedExt.test(f.name));
-  const mapped = audios.map((f, i) => ({
-    id: `${Date.now()}_${i}`,
-    name: f.name.replace(/\.[^.]+$/,''),
-    url: URL.createObjectURL(f),
-  }));
-  tracks = tracks.concat(mapped);
-  renderList();
-  if (tracks.length && !audio.src) setTrack(0);
-}
+vol.oninput  = (e) => (audio.volume = parseFloat(e.target.value));
+seek.oninput = (e) => (audio.currentTime = parseFloat(e.target.value));
 
 listEl.onclick = (e) => {
   const i = e.target.getAttribute('data-i'); if (i !== null) setTrack(parseInt(i));
@@ -66,8 +53,41 @@ audio.onplay = () => (btnPlay.textContent = '⏸');
 audio.onpause = () => (btnPlay.textContent = '▶');
 audio.ontimeupdate = () => { seek.max = audio.duration || 0; seek.value = audio.currentTime; tcur.textContent = fmt(audio.currentTime); tdur.textContent = fmt(audio.duration); };
 audio.onended = () => { if (repeatOne) { audio.currentTime = 0; audio.play(); } else next(); };
-seek.oninput = (e) => (audio.currentTime = parseFloat(e.target.value));
-vol.oninput  = (e) => (audio.volume = parseFloat(e.target.value));
 
-// SW au cas où
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js')); }
+// ---- Import classique (input) ----
+fileEl.onchange = (e) => addFileList(e.target.files);
+$('#pick').onclick = () => fileEl.click();
+
+// ---- Import mode 2 (File System Access API) ----
+$('#pick2').onclick = async () => {
+  if (!window.showOpenFilePicker) {
+    alert("Mode 2 non supporté par ce navigateur. Essaie 'Importer (classique)'.");
+    return;
+  }
+  try {
+    const handles = await window.showOpenFilePicker({
+      multiple: true,
+      types: [{ description: 'Audio', accept: { 'audio/*': ['.mp3','.m4a','.aac','.flac','.wav','.ogg','.oga'] } }]
+    });
+    const files = [];
+    for (const h of handles) { files.push(await h.getFile()); }
+    addFileList(files);
+  } catch (e) {
+    // utilisateur a annulé → rien
+  }
+};
+
+function addFileList(fileList) {
+  const files = Array.from(fileList || []);
+  const allowedExt = /\.(mp3|m4a|aac|flac|wav|ogg|oga)$/i;
+  const audios = files.filter(f => (f.type && f.type.startsWith('audio')) || allowedExt.test(f.name));
+  if (!audios.length) { alert("Aucun fichier audio reconnu."); return; }
+  const mapped = audios.map((f, i) => ({
+    id: `${Date.now()}_${i}`,
+    name: f.name.replace(/\.[^.]+$/,''),
+    url: URL.createObjectURL(f),
+  }));
+  tracks = tracks.concat(mapped);
+  renderList();
+  if (tracks.length && !audio.src) setTrack(0);
+}
