@@ -1,0 +1,28 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Debug import</title>
+<body style="background:#111;color:#eee;font-family:system-ui;padding:16px">
+  <h3>Test import</h3>
+  <button id="b1">Importer (classique)</button>
+  <button id="b2">Importer (mode 2)</button>
+  <pre id="out" style="white-space:pre-wrap;background:#222;padding:8px;border-radius:8px"></pre>
+  <input id="f" type="file" accept="audio/*" multiple hidden />
+<script>
+const out = document.getElementById('out');
+const log = (m)=>out.textContent += m + "\n";
+document.getElementById('b1').onclick = ()=> document.getElementById('f').click();
+document.getElementById('f').onchange = (e)=>{
+  const files = Array.from(e.target.files||[]);
+  log('[classique] sélection: ' + files.map(f=>f.name+' ('+(f.type||'no-type')+')').join(', '));
+};
+document.getElementById('b2').onclick = async ()=>{
+  if (!window.showOpenFilePicker){ log('[mode2] non supporté'); return; }
+  try{
+    const hs = await window.showOpenFilePicker({multiple:true, types:[{description:'Audio', accept:{'audio/*':['.mp3','.m4a','.aac','.flac','.wav','.ogg','.oga']}}]});
+    const names = [];
+    for (const h of hs){ const f = await h.getFile(); names.push(f.name+' ('+(f.type||'no-type')+')'); }
+    log('[mode2] sélection: '+names.join(', '));
+  }catch(e){ log('[mode2] annulé'); }
+};
+</script>
+</body>
