@@ -18,7 +18,7 @@
     <section class="queue">
       <div class="queue-head">
         <h2>File d’attente <span id="count" class="muted">(0)</span></h2>
-        <span class="muted">Glisser-déposer (ou utiliser “Importer”)</span>
+        <span class="muted">Glisser-déposer ou utiliser “Importer”</span>
       </div>
       <ul id="list" class="list"></ul>
     </section>
@@ -57,10 +57,10 @@
     Local only • Aucune pub • Fonctionne hors-ligne
   </footer>
 
-  <!-- Chargement du JS avec anti-cache -->
+  <!-- Script principal avec anti-cache -->
   <script src="./app.js?v=5"></script>
 
-  <!-- Enregistrement du service worker (au cas où) -->
+  <!-- Enregistrement du Service Worker (mode hors-ligne) -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
