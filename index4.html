@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lecteur de musique — PWA (index4)</title>
+  <meta name="theme-color" content="#111111" />
+  <style>
+    :root { color-scheme: dark; --bg:#0b0b0b; --fg:#f3f3f3; --muted:#9aa0a6; --card:#151515; --accent:#6366f1; }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,Segoe UI,Roboto,Arial}
+    .topbar{position:sticky;top:0;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 16px;background:#0b0b0bcc;border-bottom:1px solid #222}
+    .layout{display:grid;grid-template-columns:1fr;gap:12px;padding:12px;max-width:1000px;margin:0 auto}
+    @media (min-width:900px){.layout{grid-template-columns:2fr 1fr}}
+    .queue,.player{background:var(--card);border:1px solid #222;border-radius:16px;padding:12px}
+    .queue-head{display:flex;justify-content:space-between;align-items:center}
+    .muted{color:var(--muted)}
+    .list{list-style:none;margin:8px 0 0;padding:0;border-radius:12px;overflow:hidden}
+    .row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid #222}
+    .row:first-child{border-top:none}
+    .row.active{outline:1px solid #3b3eef44;background:#1b1b23}
+    .row-btn{flex:1;text-align:left;background:none;border:none;color:inherit;font:inherit}
+    .del{background:none;border:none;color:#e57373}
+    .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .progress{display:flex;align-items:center;gap:8px}
+    .time{font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted)}
+    .controls{display:flex;justify-content:center;gap:8px;margin:8px 0}
+    .btn{padding:8px 12px;border-radius:12px;border:1px solid #333;background:#222;color:inherit}
+    .btn.primary{background:var(--accent);border-color:#4f51e0;color:#fff}
+    .chip{padding:6px 10px;border-radius:999px;border:1px solid #333;background:#111;color:inherit}
+    .chip.on{background:#222;border-color:#555}
+    .vol{margin-top:8px}
+    .foot{padding:16px;text-align:center;border-top:1px solid #222;font-size:13px}
+    input[type="range"]{width:100%}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Lecteur de musique — PWA</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="pick" class="btn">Importer (classique)</button>
+      <button id="pick2" class="btn">Importer (mode 2)</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="queue">
+      <div class="queue-head">
+        <h2>File d’attente <span id="count" class="muted">(0)</span></h2>
+        <span class="muted">Choisis des MP3/FLAC/WAV/M4A</span>
+      </div>
+      <ul id="list" class="list"></ul>
+    </section>
+
+    <section class="player">
+      <div class="now">
+        <div class="label muted">En lecture</div>
+        <div id="title" class="title">—</div>
+      </div>
+
+      <div class="progress">
+        <span id="tcur" class="time">0:00</span>
+        <input id="seek" type="range" min="0" max="0" step="0.1" value="0" />
+        <span id="tdur" class="time">0:00</span>
+      </div>
+
+      <div class="controls">
+        <button id="shuffle" class="chip">🔀</button>
+        <button id="prev" class="btn">⏮</button>
+        <button id="play" class="btn primary">▶</button>
+        <button id="next" class="btn">⏭</button>
+        <button id="repeat" class="chip">🔁</button>
+      </div>
+
+      <div class="vol">
+        <label class="muted">Volume</label>
+        <input id="vol" type="range" min="0" max="1" step="0.01" value="0.9" />
+      </div>
+
+      <audio id="audio" preload="metadata"></audio>
+      <input id="file" type="file" accept="audio/*" multiple hidden />
+    </section>
+  </main>
+
+  <footer class="foot muted">Local only • Aucune pub • Hors-ligne (shell)</footer>
+
+  <script>
+  const $ = (s) => document.querySelector(s);
+  const listEl = $('#list'), titleEl = $('#title'), countEl = $('#count');
+  const fileEl = $('#file'), audio = $('#audio'), seek = $('#seek');
+  const tcur = $('#tcur'), tdur = $('#tdur');
+  const btnPlay = $('#play'), btnPrev = $('#prev'), btnNext = $('#next');
+  const btnPick = $('#pick'), btnPick2 = $('#pick2');
+  const btnShuffle = $('#shuffle'), btnRepeat = $('#repeat');
+  const vol = $('#vol');
+
+  let tracks = [], index = 0, shuffle = false, repeatOne = false;
+
+  const fmt = (sec) => { if (!isFinite(sec)) return '0:00';
+    const s = Math.max(0, Math.floor(sec)), m = Math.floor(s/60), r = String(s%60).padStart(2,'0'); return `${m}:${r}`; };
+
+  function renderList() {
+    countEl.textContent = `(${tracks.length})`;
+    listEl.innerHTML = '';
+    tracks.forEach((t, i) => {
+      const li = document.createElement('li');
+      li.className = 'row' + (i === index ? ' active' : '');
+      li.innerHTML = `<button class="row-btn" data-i="${i}">${i===index?'▶ ':''}${t.name}</button><button class="del" data-del="${i}">✕</button>`;
+      listEl.appendChild(li);
+    });
+  }
+
+  function setTrack(i) { if (!tracks[i]) return;
+    index = i; audio.src = tracks[i].url; titleEl.textContent = tracks[i].name; renderList(); if (!audio.paused) audio.play(); }
+
+  function next() {
+    if (shuffle && tracks.length > 1) { let n = index; while (n === index) n = Math.floor(Math.random()*tracks.length); setTrack(n); }
+    else setTrack((index+1)%tracks.length);
+  }
+  function prev() { setTrack((index - 1 + tracks.length) % tracks.length); }
+
+  // boutons player
+  document.addEventListener('click', (e)=>{
+    if (e.target.id === 'play') (audio.paused ? audio.play() : audio.pause());
+    if (e.target.id === 'next') next();
+    if (e.target.id === 'prev') prev();
+    if (e.target.id === 'shuffle') { shuffle = !shuffle; e.target.classList.toggle('on', shuffle); }
+    if (e.target.id === 'repeat')  { repeatOne = !repeatOne; e.target.classList.toggle('on', repeatOne); }
+  });
+
+  vol.oninput  = (e) => (audio.volume = parseFloat(e.target.value));
+  seek.oninput = (e) => (audio.currentTime = parseFloat(e.target.value));
+
+  listEl.onclick = (e) => {
+    const i = e.target.getAttribute('data-i'); if (i !== null) setTrack(parseInt(i));
+    const del = e.target.getAttribute('data-del'); if (del !== null) {
+      const di = parseInt(del); tracks.splice(di,1);
+      if (!tracks.length) { audio.pause(); audio.removeAttribute('src'); titleEl.textContent = '—'; }
+      else if (di === index) { index = Math.min(index, tracks.length-1); setTrack(index); }
+      renderList();
+    }
+  };
+
+  audio.onplay = () => {
+    const p = document.getElementById('play'); if (p) p.textContent = '⏸';
+  };
+  audio.onpause = () => {
+    const p = document.getElementById('play'); if (p) p.textContent = '▶';
+  };
+  audio.ontimeupdate = () => {
+    seek.max = audio.duration || 0; seek.value = audio.currentTime;
+    tcur.textContent = fmt(audio.currentTime); tdur.textContent = fmt(audio.duration);
+  };
+  audio.onended = () => { if (repeatOne) { audio.currentTime = 0; audio.play(); } else next(); };
+
+  // ---- Import classique (input) ----
+  btnPick.onclick = () => {
+    try { fileEl.click(); } catch (e) { alert('Input non accessible: ' + e); }
+  };
+  fileEl.onchange = (e) => addFileList(e.target.files);
+
+  // ---- Import mode 2 (File System Access API) ----
+  btnPick2.onclick = async () => {
+    if (!window.showOpenFilePicker) { alert("Mode 2 non supporté par ce navigateur. Essaie 'Importer (classique)'."); return; }
+    try {
+      const handles = await window.showOpenFilePicker({
+        multiple: true,
+        types: [{ description: 'Audio', accept: { 'audio/*': ['.mp3','.m4a','.aac','.flac','.wav','.ogg','.oga'] } }]
+      });
+      const files = [];
+      for (const h of handles) { files.push(await h.getFile()); }
+      addFileList(files);
+    } catch (e) { /* annulé */ }
+  };
+
+  function addFileList(fileList) {
+    const files = Array.from(fileList || []);
+    const allowedExt = /\.(mp3|m4a|aac|flac|wav|ogg|oga)$/i;
+    const audios = files.filter(f => (f.type && f.type.startsWith('audio')) || allowedExt.test(f.name));
+    if (!audios.length) { alert("Aucun fichier audio reconnu."); return; }
+    const mapped = audios.map((f, i) => ({
+      id: `${Date.now()}_${i}`, name: f.name.replace(/\.[^.]+$/,''), url: URL.createObjectURL(f),
+    }));
+    tracks = tracks.concat(mapped);
+    renderList();
+    if (tracks.length && !audio.src) setTrack(0);
+  }
+
+  // Pas d’enregistrement SW ici pour éviter tout cache pendant le debug.
+  </script>
+</body>
+</html>
