@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Reset PWA</title>
+<body style="font-family:system-ui;background:#111;color:#eee;padding:16px">
+  <h3>Reset PWA</h3>
+  <p>Clique le bouton pour désinstaller le Service Worker et vider les caches. Puis recharge ton appli.</p>
+  <button id="go" style="padding:10px 16px;border-radius:10px;border:1px solid #333;background:#222;color:#fff">Reset</button>
+  <pre id="out" style="white-space:pre-wrap;background:#222;padding:8px;border-radius:8px;margin-top:12px"></pre>
+<script>
+(async () => {
+  const out = document.getElementById('out');
+  const log = (m)=>out.textContent += m + "\n";
+  document.getElementById('go').onclick = async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs) { await r.unregister(); }
+        log('Service workers: désenregistrés.');
+      } else {
+        log('Pas de service worker supporté.');
+      }
+      if (window.caches && caches.keys) {
+        const keys = await caches.keys();
+        for (const k of keys) { await caches.delete(k); }
+        log('Caches: vidés (' + (await caches.keys()).length + ' restants).');
+      } else {
+        log('API Cache non dispo.');
+      }
+      log('OK. Maintenant, rouvre la page index4.html (voir étape 2).');
+      alert('Reset fait. Retourne sur index4.html.');
+    } catch (e) {
+      log('Erreur: ' + (e && e.message ? e.message : e));
+      alert('Erreur reset: ' + e);
+    }
+  };
+})();
+</script>
+</body>
