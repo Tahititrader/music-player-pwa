@@ -1,9 +1,7 @@
-const CACHE_NAME = 'pwa-music-shell-v1';
+const CACHE_NAME = 'pwa-music-pro-v1';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css',
-  './app.js',
   './manifest.webmanifest',
   './icons/icon-192.svg',
   './icons/icon-512.svg'
@@ -24,9 +22,8 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  const { request } = e;
-  if (request.method !== 'GET') return;
+  if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request))
+    caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
 });
