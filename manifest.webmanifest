@@ -1,6 +1,6 @@
 {
-  "name": "Lecteur de musique PRO",
-  "short_name": "Musique PRO",
+  "name": "MyMusicBox",
+  "short_name": "MyMusicBox",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#050505",
