@@ -1,5 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192">
-  <rect width="100%" height="100%" fill="#111"/>
-  <circle cx="96" cy="96" r="72" fill="#6366f1"/>
-  <polygon points="86,66 138,96 86,126" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d0d1a"/>
+      <stop offset="100%" stop-color="#07070f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <!-- Glow ring -->
+  <circle cx="96" cy="96" r="72" fill="none" stroke="url(#accent)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Music note icon -->
+  <g filter="url(#glow)" fill="url(#accent)">
+    <!-- Note stem + head -->
+    <rect x="100" y="62" width="8" height="46" rx="4"/>
+    <ellipse cx="92" cy="108" rx="14" ry="10" transform="rotate(-15 92 108)"/>
+    <!-- Second note -->
+    <rect x="118" y="56" width="8" height="40" rx="4"/>
+    <ellipse cx="110" cy="96" rx="14" ry="10" transform="rotate(-15 110 96)"/>
+    <!-- Beam connecting notes -->
+    <rect x="100" y="62" width="26" height="7" rx="3"/>
+  </g>
+  <!-- MMB letters -->
+  <text x="96" y="148" font-family="'Space Grotesk',system-ui,sans-serif" font-size="18" font-weight="700" fill="url(#accent)" text-anchor="middle" letter-spacing="2" opacity="0.9">MMB</text>
 </svg>
