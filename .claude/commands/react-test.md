@@ -13,7 +13,7 @@ This command enforces test-driven development for React using React Testing Libr
 3. **Run Tests**: Verify they fail for the right reason
 4. **Implement Minimal Code**: Just enough to pass — GREEN
 5. **Refactor**: Improve while keeping tests green
-6. **Check Coverage**: Hit the targets in [rules/react/testing.md](../rules/react/testing.md)
+6. **Check Coverage**: Hit the targets in [rules/react/testing.md](../rules/ecc/react/testing.md)
 
 ## When to Use
 
