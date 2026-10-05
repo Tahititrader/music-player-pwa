@@ -11,15 +11,14 @@ tout est donc copié dans le dépôt, versions épinglées ci-dessous.
 | [superpowers](https://github.com/obra/superpowers) | 6.4.2 (`8ca22db`) | MIT | 15 skills (`brainstorming`, `test-driven-development`, `systematic-debugging`, `writing-plans`…) |
 | [ponytail](https://github.com/DietrichGebert/ponytail) | 4.11.0 (`2b0ea88`) | MIT | 6 skills `ponytail*` |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | plugin 1.3.1 (`24fe0ef`) | MIT | les 27 skills du plugin officiel (`grill-me`, `tdd`, `to-spec`, `implement`, `code-review`, `pr`…) |
-| [anthropics/skills](https://github.com/anthropics/skills) | `8a1541c` | Apache-2.0 (par skill) | 14 skills : `frontend-design`, `mcp-builder`, `skill-creator`, `webapp-testing`, `canvas-design`, `doc-coauthoring`… |
+| [anthropics/skills](https://github.com/anthropics/skills) | `8a1541c` | Apache-2.0 (par skill) | 14 skills : `frontend-design`, `mcp-builder`, `skill-creator`, `webapp-testing`, `canvas-design`, `doc-coauthoring`… ; LegacyFX-Ultra- n'en garde que 9 (`canvas-design`, `algorithmic-art`, `slack-gif-creator`, `theme-factory` et `internal-comms` retirés le 2026-10-05) |
 | [graphify](https://github.com/Graphify-Labs/graphify) | 0.9.76 (`graphifyy` sur PyPI) | Apache-2.0 / MIT | skill `graphify` ; graphe dans `graphify-out/` (LegacyFX-Ultra-, Trading-App) ; périmètre : `.graphifyignore` |
 | [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) | `a89c275` (méthode) | MIT | vault Obsidian `vault/` (LegacyFX-Ultra-) + commandes `/vault-resume`, `/vault-save` (3 dépôts) |
-| [JavaGuide](https://github.com/Snailclimb/JavaGuide) | `9eab7aa` | Apache-2.0 | skill `javaguide` avec les 454 articles (LegacyFX-Ultra- seulement) |
-| [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | image Docker `3.8.51` | MIT | service `omniroute` du `docker-compose.yml`, guides `omniroute/skills/`, skill `omniroute` (LegacyFX-Ultra- seulement) |
+| [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | image Docker `3.8.51` | MIT | service `omniroute` du `docker-compose.yml` (profil `omniroute`, hors démarrage par défaut), guides `omniroute/skills/`, skill `omniroute` (LegacyFX-Ultra- seulement) |
 | [ComfyUI](https://github.com/Comfy-Org/ComfyUI) | release `v0.38.2`, code non vendorisé | GPL-3.0 | doc `comfyui/README.md` et skill `comfyui` (client `comfy_run.py`, workflow SDXL) (LegacyFX-Ultra- seulement) |
 
-Licences des ensembles de skills : `vendor/licenses/` ; celles des skills Anthropic et de
-JavaGuide sont dans leur dossier respectif.
+Licences des ensembles de skills : `vendor/licenses/` ; celles des skills Anthropic sont dans
+leur dossier respectif.
 
 ## Adaptations locales
 
