@@ -16,6 +16,7 @@ tout est donc copié dans le dépôt, versions épinglées ci-dessous.
 | [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) | `a89c275` (méthode) | MIT | vault Obsidian `vault/` (LegacyFX-Ultra-) + commandes `/vault-resume`, `/vault-save` (3 dépôts) |
 | [JavaGuide](https://github.com/Snailclimb/JavaGuide) | `9eab7aa` | Apache-2.0 | skill `javaguide` avec les 454 articles (LegacyFX-Ultra- seulement) |
 | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | image Docker `3.8.51` | MIT | service `omniroute` du `docker-compose.yml`, guides `omniroute/skills/`, skill `omniroute` (LegacyFX-Ultra- seulement) |
+| [ComfyUI](https://github.com/Comfy-Org/ComfyUI) | release `v0.38.2`, code non vendorisé | GPL-3.0 | doc `comfyui/README.md` et skill `comfyui` (client `comfy_run.py`, workflow SDXL) (LegacyFX-Ultra- seulement) |
 
 Licences des ensembles de skills : `vendor/licenses/` ; celles des skills Anthropic et de
 JavaGuide sont dans leur dossier respectif.
