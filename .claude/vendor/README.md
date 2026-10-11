@@ -17,6 +17,7 @@ tout est donc copié dans le dépôt, versions épinglées ci-dessous.
 | [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) | `a89c275` (méthode) | MIT | vault Obsidian `vault/` (LegacyFX-Ultra-) + commandes `/vault-resume`, `/vault-save` (3 dépôts) |
 | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | image Docker `3.8.51` | MIT | service `omniroute` du `docker-compose.yml` (profil `omniroute`, hors démarrage par défaut), guides `omniroute/skills/`, skill `omniroute` (LegacyFX-Ultra- seulement) |
 | [ComfyUI](https://github.com/Comfy-Org/ComfyUI) | release `v0.38.2`, code non vendorisé | GPL-3.0 | doc `comfyui/README.md` et skill `comfyui` (client `comfy_run.py`, workflow SDXL) (LegacyFX-Ultra- seulement) |
+| [brag](https://github.com/latent-spaces/brag) | 0.4.0 (`8531ccb`, 2026-10-09) | MIT (code) ; musiques ende.app : licence non précisée en amont ; bruitages Kenney (CC0) | skills `brag` (17 Mo, musiques et bruitages compris, LegacyFX-Ultra- seulement) et `brag-slim` (3 dépôts) : vidéo de lancement de 15 à 25 s du projet |
 
 Licences des ensembles de skills : `vendor/licenses/` ; celles des skills Anthropic sont dans
 leur dossier respectif.
@@ -35,6 +36,11 @@ leur dossier respectif.
   `scripts/public_apis.py` sont écrits ici ; `data/` est généré depuis le README amont, liens
   débarrassés de leurs paramètres `utm_` (colonne `sponsored`). Mise à jour : section
   « Mettre à jour l'index » du skill.
+- **brag** : `brag/slim.md`, copie de `brag-slim/SKILL.md` lue par le passage automatique à
+  `/brag-slim` sur Opus 5.5, manque dans le dépôt amont (son propre contrôle
+  `scripts/check-brag-slim.mjs` l'exige) : ajoutée ici, à garder identique. Le `/brag` complet
+  rend via Hyperframes (`npx hyperframes`, téléchargé au premier lancement) ; `/brag-slim` se
+  contente de ce qui est sur la machine (node, ffmpeg, navigateur).
 
 ## Volontairement non installé
 
