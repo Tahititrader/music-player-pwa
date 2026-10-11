@@ -12,6 +12,7 @@ tout est donc copié dans le dépôt, versions épinglées ci-dessous.
 | [ponytail](https://github.com/DietrichGebert/ponytail) | 4.11.0 (`2b0ea88`) | MIT | 6 skills `ponytail*` |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | plugin 1.3.1 (`24fe0ef`) | MIT | les 27 skills du plugin officiel (`grill-me`, `tdd`, `to-spec`, `implement`, `code-review`, `pr`…) |
 | [anthropics/skills](https://github.com/anthropics/skills) | `8a1541c` | Apache-2.0 (par skill) | 14 skills : `frontend-design`, `mcp-builder`, `skill-creator`, `webapp-testing`, `canvas-design`, `doc-coauthoring`… ; LegacyFX-Ultra- n'en garde que 9 (`canvas-design`, `algorithmic-art`, `slack-gif-creator`, `theme-factory` et `internal-comms` retirés le 2026-10-05) |
+| [vercel-labs/skills](https://github.com/vercel-labs/skills) | 1.7.2 (`13e4063`) | MIT | skill `find-skills` (recherche et installation via la CLI `npx skills`) |
 | [graphify](https://github.com/Graphify-Labs/graphify) | 0.9.76 (`graphifyy` sur PyPI) | Apache-2.0 / MIT | skill `graphify` ; graphe dans `graphify-out/` (LegacyFX-Ultra-, Trading-App) ; périmètre : `.graphifyignore` |
 | [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) | `a89c275` (méthode) | MIT | vault Obsidian `vault/` (LegacyFX-Ultra-) + commandes `/vault-resume`, `/vault-save` (3 dépôts) |
 | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | image Docker `3.8.51` | MIT | service `omniroute` du `docker-compose.yml` (profil `omniroute`, hors démarrage par défaut), guides `omniroute/skills/`, skill `omniroute` (LegacyFX-Ultra- seulement) |
@@ -30,6 +31,8 @@ leur dossier respectif.
   `ecc:planner` comme l'indique `rules/ecc/common/agents.md`, écrit pour le plugin).
 - **ECC** : l'installateur ajoute `"includeCoAuthoredBy": false` aux réglages ; cette
   modification a été annulée (l'attribution des commits n'était pas dans la demande).
+- **find-skills** : une note ajoutée à l'étape 6 rappelle que `npx skills add -g` installe dans
+  `~/.claude/skills`, perdu en fin de session cloud ; un skill durable se vendorise ici.
 
 ## Volontairement non installé
 
