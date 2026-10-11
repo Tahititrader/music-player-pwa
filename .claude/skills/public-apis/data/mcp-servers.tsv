@@ -1,0 +1,14 @@
+name	url	description	auth	transport
+Monocrawl	https://github.com/monocrawl/monocrawl-mcp	Public posts, profiles, comments and products from 70+ social, shopping and search platforms	apiKey	stdio`, `HTTP
+OpenSwissData	https://github.com/cammac-creator/openswissdata/tree/main/sdks/mcp-server	Swiss customs tariff (TARES), FINMA register and warnings, NOGA/NACE/ISIC code crosswalks	No	stdio`, `HTTP
+IPstack MCP	https://ipstack.com/mcp	IP geolocation, threat and timezone lookups for agents	apiKey	stdio`, `HTTP
+Kuro	https://meetkuro.com/agents/	Create AI images, video clips, voice-overs, music and editable storyboard films	OAuth	HTTP
+Catastro GPS	https://github.com/TheHiddenPandaDev/catastro_gps_mcp	Cadastral parcels in 29 European countries by reference, point or address	apiKey	stdio
+corpusAI Cloud Pricing	https://cloud.trycorpus.ai/docs#quick-start-for-agents	Cloud, GPU and LLM token prices for agents, free discovery tools and paid per-call data	No	stdio`, `HTTP
+Edgepedia	https://github.com/EdgePlat/edgepedia-mcp	Search and read Edgepedia, a free and growing encyclopedia with citations	No	HTTP
+GitHub	https://github.com/github/github-mcp-server	Repos, issues, PRs, code search	OAuth	stdio`, `HTTP
+Filesystem	https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem	Read/write local files	No	stdio
+RegSentry	https://regsentry.com/mcp-guide	Inspect authorized static tracking signals and review supplied consent evidence	No	HTTP
+Silicon Floor	https://siliconfloor.com/docs/mcp	Who owns AI and chip stocks, what insiders sell, how fast they grow: answers from SEC filings	No	HTTP
+Twinbay	https://docs.twinbay.ai/mcp-server	Spin up stateful API twins, read request logs and grade agent runs	OAuth	HTTP
+Vuntum	https://github.com/RAAAAAGEEEEE/vuntum-mcp	Sourced, dated data on consumer robots and physical AI: specs, prices, evidence	No	HTTP
